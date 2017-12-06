@@ -37,6 +37,14 @@ ifeq ($(OSTYPE),win)
 WINDRES = windres
 endif
 
+# Emscripten
+OUTPUTNAME = mp3gain
+TARGETOPTIONS =
+ifeq ($(findstring emcc,$(CC)),emcc)
+TARGETOPTIONS = -O3 -s BUILD_AS_WORKER=1
+OUTPUTNAME = mp3gain.js
+endif
+
 OBJS=	mp3gain.o apetag.o id3tag.o gain_analysis.o rg_error.o \
 	mpglibDBL/common.o mpglibDBL/dct64_i386.o \
 	mpglibDBL/decode_i386.o mpglibDBL/interface.o \
@@ -47,11 +55,11 @@ endif
 
 all: mp3gain
 
-$(RC_OBJ): 
+$(RC_OBJ):
 	$(WINDRES) $(RC_OBJ:.o=.rc) $(RC_OBJ)
 
 mp3gain: $(RC_OBJ) $(OBJS)
-	$(CC) $(LDFLAGS) -o mp3gain $(OBJS) $(RC_OBJ) $(LIBS)
+	$(CC) $(LDFLAGS)$(TARGETOPTIONS) -o $(OUTPUTNAME) $(OBJS) $(RC_OBJ) $(LIBS)
 ifeq ($(OSTYPE),beos)
 	mimeset -f mp3gain$(EXE_EXT)
 endif
@@ -73,8 +81,8 @@ else
 	@echo uninstall target is not implemented on windows
 endif
 
-clean: 
-	-rm -rf mp3gain$(EXE_EXT) mp3gain.zip $(OBJS) $(RC_OBJ)
+clean:
+	-rm -rf $(OUTPUTNAME)$(EXE_EXT) mp3gain.zip $(OBJS) $(RC_OBJ)
 
 dist:   clean
 ifneq ($(OSTYPE),win)
