@@ -41,7 +41,7 @@ endif
 OUTPUTNAME = mp3gain
 TARGETOPTIONS =
 ifeq ($(findstring emcc,$(CC)),emcc)
-TARGETOPTIONS = -O3 -s BUILD_AS_WORKER=1
+TARGETOPTIONS = -O3 --memory-init-file 0 -s BUILD_AS_WORKER=0
 OUTPUTNAME = mp3gain.js
 endif
 
